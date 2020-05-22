@@ -16,6 +16,10 @@ module Pbs::EventDecorator
     decorates_association :advisor_mountain_security
     decorates_association :advisor_snow_security
     decorates_association :advisor_water_security
+
+    def as_quicksearch
+      { id: id, label: label_with_group, type: :event, icon: icon }
+    end
   end
 
   def can_have_confirmations?
@@ -25,5 +29,17 @@ module Pbs::EventDecorator
   def qualified_participants_count
     @qualified_participants_count ||= participations.includes(:roles).decorate
                                         .select(&:has_confirmation?).count
+  end
+
+  private
+
+  def icon
+    if model.is_a? Event::Course
+      :book
+    elsif model.is_a? Event::Camp
+      :campground
+    else
+      :'calendar-alt'
+    end
   end
 end
